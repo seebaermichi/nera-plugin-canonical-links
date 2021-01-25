@@ -1,7 +1,6 @@
 app_origin: https://example.com
 page_identifier: slug
 available_languages:
-  - de
   - en
   - es
   - fr
