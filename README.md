@@ -51,7 +51,7 @@ Of course we would have three `index.md` files:
     |-- fr
         |-- index.md
 ```
-The meta section of each index file should look like this:
+The meta section of each index file should look like this:  
 _`pages/index.md`_
 ```markdown
 ---
