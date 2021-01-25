@@ -1,0 +1,3 @@
+if (meta.alternateLinks && meta.alternateLinks.length > 0)
+    each alternate in meta.alternateLinks
+        link(href=alternate.href, hreflang=alternate.hreflang, rel=alternate.rel)
