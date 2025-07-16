@@ -1,85 +1,142 @@
-# Canonical links - Nera plugin
-This plugin allows you to create canonical links in the head of your Nera website. These links help search engines to recognize same content of different domains, e.g. _www.domain.com_ and _domain.com_ and same content in different languages.
+# @nera-static/plugin-canonical-links
 
-Depending on your website this plugin provides something like this:
-```html
-<link href="https://example.com/index.html" rel="canonical"/>
-<link href="https://example.com/es/index.html" hreflang="es" rel="alternate"/>
-<link href="https://example.com/fr/index.html" hreflang="fr" rel="alternate"/>
-```
+A plugin for the [Nera](https://github.com/seebaermichi/nera) static site generator to generate canonical and alternate `<link>` tags for SEO in the document `<head>`. Helps search engines correctly index content across domains and languages.
 
-## Installation
-To install this plugin, just clone this repo into the `plugins` folder of your Nera website.
+## ✨ Features
+
+-   Adds `<link rel="canonical">` for SEO
+-   Supports multilingual alternate links
+-   Easy Pug template integration
+-   Configurable origin and slug mapping
+
+## 🚀 Installation
+
+Install the plugin in the root of your Nera project:
+
 ```bash
-git clone git@github.com:seebaermichi/nera-plugin-canonical-links.git canonical-links
-```
-Remove the `.git` folder:
-```bash
-rm -fr src/plugins/canonical-links/.git
+npm install @nera-static/plugin-canonical-links
 ```
 
-## Usage
-### Canonical link
-To add the canonical link to your Nera website head you need to provide the origin of your website in your app config file:  
-_`config/app.yaml`_
-```yaml
-origin: https://your-domain.com
+Then create a config file in your project’s `config/` directory:
+
 ```
-or in the plugin config file:
-_`src/plugins/canonical-links/config/canonical-links.yaml`_
+config/
+└── canonical-links.yaml
+```
+
+Nera will automatically detect the plugin and apply it during the build.
+
+## ⚙️ Configuration
+
+Create `config/canonical-links.yaml`:
+
 ```yaml
 app_origin: https://your-domain.com
+page_identifier: slug
+available_languages:
+    - en
+    - es
+    - fr
 ```
-Next you just need to include the template in your the head of your Nera website.
-_`views/layouts/layout.pug`_
+
+-   `app_origin`: The canonical base URL (overrides `app.origin`).
+-   `page_identifier`: Shared key to match localized versions (defaults to `slug`).
+-   `available_languages`: List of supported language codes (used to create alternate links).
+
+## 📄 Usage in Templates
+
+Include the plugin’s view in your layout head:
+
 ```pug
 head
-    include ../../src/plugins/canonical-links/views/index
+    include /node_modules/@nera-static/plugin-canonical-links/views/index
 ```
 
-### Alternate links
-If you have the same or similar content in different languages, you might want to have the alternate link feature of this plugin as well.  
-To use it you need to make sure, that every page you want to cover has the `lang` property and a property which will act as an identifier for the same or similar content. This plugin would look for the `slug` property by default, but you can configure another one in the plugins config file `src/plugins/canonical-links/config/canonical-links.yaml`.
+This will generate:
 
-If we take the above two links as an example, let's see what needs to be setup to achieve this.  
-Of course we would have three `index.md` files:
+```html
+<link href="https://example.com/index.html" rel="canonical" />
+<link href="https://example.com/es/index.html" hreflang="es" rel="alternate" />
+<link href="https://example.com/fr/index.html" hreflang="fr" rel="alternate" />
 ```
-|-- pages
-    |-- index.md
-    |-- es
-        |-- index.md
-    |-- fr
-        |-- index.md
+
+## 🗂️ Content Structure
+
+To use alternate links, provide a shared identifier (e.g., `slug`) across translations:
+
 ```
-The meta section of each index file should look like this:  
-_`pages/index.md`_
-```markdown
----
+pages/
+├── index.md
+├── es/
+│   └── index.md
+└── fr/
+    └── index.md
+```
+
+Example frontmatter for each:
+
+**pages/index.md**
+
+```yaml
 lang: en
 slug: home
-others: ...
----
-content
 ```
 
-_`pages/es/index.md`_
-```markdown
----
+**pages/es/index.md**
+
+```yaml
 lang: es
 slug: home
-others: ...
----
-content
 ```
 
-_`pages/fr/index.md`_
-```markdown
----
+**pages/fr/index.md**
+
+```yaml
 lang: fr
 slug: home
-others: ...
----
-content
 ```
 
-That's all it needs. Now Nera will know which content is related and will create the appropriate alternate links for each of these three pages.
+## 🧩 Rendering Details
+
+The plugin provides a view file that includes two partials:
+
+-   `views/index.pug`
+
+    ```pug
+    include partials/canonical-link
+    include partials/alternate-links
+    ```
+
+-   `views/partials/canonical-link.pug`
+
+    ```pug
+    if (meta.canonicalLink)
+        link(href=meta.canonicalLink.href, rel=meta.canonicalLink.rel)
+    ```
+
+-   `views/partials/alternate-links.pug`
+    ```pug
+    if (meta.alternateLinks && meta.alternateLinks.length > 0)
+        each alternate in meta.alternateLinks
+            link(href=alternate.href, hreflang=alternate.hreflang, rel=alternate.rel)
+    ```
+
+You can copy or customize these templates for full control.
+
+## 🧪 Development
+
+```bash
+npm install
+npm run test
+```
+
+Includes unit and integration tests using [Vitest](https://vitest.dev) and [Pug](https://pugjs.org).
+
+## 🧑‍💻 Author
+
+Michael Becker  
+[GitHub](https://github.com/seebaermichi)
+
+## 📦 License
+
+MIT

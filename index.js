@@ -1,54 +1,62 @@
-const { getConfig } = require('../plugin-helper')
+import path from 'path'
+import { getConfig } from '@nera-static/plugin-utils'
 
-module.exports = (() => {
-    const config = getConfig(`${__dirname}/config/multi-lang-canonical.yaml`)
-    const availableLanguages = config.available_languages
+const HOST_CONFIG_PATH = path.resolve(
+    process.cwd(),
+    'config/canonical-links.yaml'
+)
+
+const config = getConfig(HOST_CONFIG_PATH)
+
+function getOrigin(data) {
+    return data.app.origin || config.app_origin
+}
+
+function getAlternates(pageMeta, data) {
     const pageIdentifier = config.page_identifier || 'slug'
+    const availableLanguages = config.available_languages || []
+    const multiLangCanonicals = []
 
-    const getOrigin = data => data.app.origin || config.app_origin
+    availableLanguages.forEach((availableLang) => {
+        if (pageMeta.lang && availableLang !== pageMeta.lang) {
+            const relCanonical = data.pagesData.find(
+                ({ meta }) =>
+                    meta.lang === availableLang &&
+                    meta[pageIdentifier] === pageMeta[pageIdentifier]
+            )
 
-    const getCanonical = (meta, data) => {
-        return {
-            href: `${getOrigin(data)}${meta.href}`,
-            rel: 'canonical'
-        }
-    }
-
-    const getAlternates = (pageMeta, data) => {
-        const multiLangCanonicals = []
-        const REL = 'alternate'
-
-        availableLanguages.forEach(availableLang => {
-            if (pageMeta.lang && availableLang !== pageMeta.lang) {
-                const relCanonical = data.pagesData
-                    .find(({ meta }) => meta.lang === availableLang && meta[pageIdentifier] === pageMeta[pageIdentifier])
-
+            if (relCanonical) {
                 multiLangCanonicals.push({
                     href: `${getOrigin(data)}${relCanonical.meta.href}`,
                     hreflang: availableLang,
-                    rel: REL
+                    rel: 'alternate',
                 })
             }
-        })
+        }
+    })
 
-        return multiLangCanonicals
+    return multiLangCanonicals
+}
+
+function getCanonical(meta, data) {
+    return {
+        href: `${getOrigin(data)}${meta.href}`,
+        rel: 'canonical',
     }
+}
 
-    const getMetaData = data => {
-        data.pagesData = data.pagesData.map(({ content, meta }) => {
-            return {
-                content,
-                meta: Object.assign({}, meta, {
-                    canonicalLink: getCanonical(meta, data),
-                    alternateLinks: getAlternates(meta, data)
-                })
-            }
-        })
-
+export function getMetaData(data) {
+    if (!config) {
         return data.pagesData
     }
 
-    return {
-        getMetaData
-    }
-})()
+    return data.pagesData.map(({ content, meta }) => {
+        return {
+            content,
+            meta: Object.assign({}, meta, {
+                canonicalLink: getCanonical(meta, data),
+                alternateLinks: getAlternates(meta, data),
+            }),
+        }
+    })
+}
