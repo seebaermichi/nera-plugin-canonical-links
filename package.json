@@ -1,6 +1,6 @@
 {
     "name": "@nera-static/plugin-canonical-links",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "description": "A plugin for Nera static site generator to create canonical links in to be used in the head.",
     "main": "index.js",
     "scripts": {
@@ -18,10 +18,14 @@
     ],
     "keywords": [
         "nera",
-        "plugin",
-        "canonical links",
-        "static-site",
-        "template"
+        "nera-plugin",
+        "static-site-generator",
+        "canonical-links",
+        "seo",
+        "alternate-links",
+        "multilingual",
+        "head-tags",
+        "jamstack"
     ],
     "author": "Michael Becker",
     "license": "MIT",

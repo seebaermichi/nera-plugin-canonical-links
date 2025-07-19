@@ -143,6 +143,12 @@ Michael Becker
 -   [NPM Package](https://www.npmjs.com/package/@nera-static/plugin-canonical-links)
 -   [Nera Static Site Generator](https://github.com/seebaermichi/nera)
 
-## 📦 License
+## � Compatibility
+
+-   **Nera**: v4.1.0+
+-   **Node.js**: >= 18
+-   **Plugin API**: Uses `getMetaData()` for optimal performance
+
+## �📦 License
 
 MIT
