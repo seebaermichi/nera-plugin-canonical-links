@@ -135,7 +135,13 @@ Includes unit and integration tests using [Vitest](https://vitest.dev) and [Pug]
 ## 🧑‍💻 Author
 
 Michael Becker  
-[GitHub](https://github.com/seebaermichi)
+[https://github.com/seebaermichi](https://github.com/seebaermichi)
+
+## 🔗 Links
+
+-   [Plugin Repository](https://github.com/seebaermichi/nera-plugin-canonical-links)
+-   [NPM Package](https://www.npmjs.com/package/@nera-static/plugin-canonical-links)
+-   [Nera Static Site Generator](https://github.com/seebaermichi/nera)
 
 ## 📦 License
 
