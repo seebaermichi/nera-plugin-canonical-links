@@ -1,9 +1,10 @@
 {
     "name": "@nera-static/plugin-canonical-links",
-    "version": "2.0.1",
+    "version": "2.1.0",
     "description": "A plugin for Nera static site generator to create canonical links in to be used in the head.",
     "main": "index.js",
     "scripts": {
+        "publish-template": "node ./bin/publish-template.js",
         "lint": "eslint .",
         "test": "vitest"
     },
@@ -11,10 +12,15 @@
     "exports": {
         ".": "./index.js"
     },
+    "bin": {
+        "nera-canonical-links": "./bin/publish-template.js"
+    },
     "files": [
+        "bin",
         "config",
         "index.js",
-        "views"
+        "views",
+        "CHANGELOG.md"
     ],
     "keywords": [
         "nera",
@@ -38,7 +44,7 @@
     },
     "homepage": "https://github.com/seebaermichi/nera-plugin-canonical-links#readme",
     "dependencies": {
-        "@nera-static/plugin-utils": "^1.0.3"
+        "@nera-static/plugin-utils": "^1.2.0"
     },
     "engines": {
         "node": ">=18"

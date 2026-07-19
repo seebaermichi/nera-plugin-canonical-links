@@ -1,18 +1,22 @@
 import path from 'path'
 import { getConfig } from '@nera-static/plugin-utils'
 
-const HOST_CONFIG_PATH = path.resolve(
-    process.cwd(),
-    'config/canonical-links.yaml'
-)
-
-const config = getConfig(HOST_CONFIG_PATH)
-
-function getOrigin(data) {
-    return data.app.origin || config.app_origin
+// Resolved per call rather than at module scope: the host project's cwd is
+// what matters, and resolving lazily is what makes this testable.
+function getHostConfig() {
+    return getConfig(path.resolve(process.cwd(), 'config/canonical-links.yaml'))
 }
 
-function getAlternates(pageMeta, data) {
+/**
+ * The canonical base URL. `app.origin` from config/app.yaml wins over the
+ * plugin's own `app_origin` — the opposite of what the README claimed
+ * before 2.1.0.
+ */
+function getOrigin(data, config) {
+    return data.app?.origin || config.app_origin
+}
+
+function getAlternates(pageMeta, data, config, origin) {
     const pageIdentifier = config.page_identifier || 'slug'
     const availableLanguages = config.available_languages || []
     const multiLangCanonicals = []
@@ -27,7 +31,7 @@ function getAlternates(pageMeta, data) {
 
             if (relCanonical) {
                 multiLangCanonicals.push({
-                    href: `${getOrigin(data)}${relCanonical.meta.href}`,
+                    href: `${origin}${relCanonical.meta.href}`,
                     hreflang: availableLang,
                     rel: 'alternate',
                 })
@@ -38,15 +42,26 @@ function getAlternates(pageMeta, data) {
     return multiLangCanonicals
 }
 
-function getCanonical(meta, data) {
+function getCanonical(meta, origin) {
     return {
-        href: `${getOrigin(data)}${meta.href}`,
+        href: `${origin}${meta.href}`,
         rel: 'canonical',
     }
 }
 
 export function getMetaData(data) {
-    if (!config) {
+    const config = getHostConfig()
+    const origin = getOrigin(data, config)
+
+    // Without an origin every page used to get
+    // <link rel="canonical" href="undefined/blog/post.html">, which is worse
+    // than emitting nothing at all — it hands search engines a broken URL as
+    // the authoritative one. Bail out loudly instead.
+    if (!origin) {
+        console.warn(
+            '⚠️ plugin-canonical-links: no origin configured, so no canonical links were generated.\n' +
+                '    Set `origin` in config/app.yaml, or `app_origin` in config/canonical-links.yaml.'
+        )
         return data.pagesData
     }
 
@@ -54,8 +69,8 @@ export function getMetaData(data) {
         return {
             content,
             meta: Object.assign({}, meta, {
-                canonicalLink: getCanonical(meta, data),
-                alternateLinks: getAlternates(meta, data),
+                canonicalLink: getCanonical(meta, origin),
+                alternateLinks: getAlternates(meta, data, config, origin),
             }),
         }
     })

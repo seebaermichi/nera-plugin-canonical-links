@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-07-19
+
+### Fixed
+
+-   no longer emits `<link rel="canonical" href="undefined/...">` on every page
+    when no origin is configured. That markup was worse than none — it told
+    search engines the authoritative URL was a broken string, and nothing was
+    printed to warn about it. The plugin now warns once and leaves pages
+    untouched
+
+### Added
+
+-   `publish-template` command (`npx nera-canonical-links`), so the shipped
+    templates can be copied into `views/vendor/` like every other plugin.
+    Previously there was no publish path at all and the README worked around it
+    by including straight out of `node_modules/`
+-   `--force` to re-publish over existing templates, discarding local edits
+
+### Changed
+
+-   `@nera-static/plugin-utils` range widened to `^1.2.0`, which is what makes
+    `partials/` publish alongside `index.pug`
+-   config is resolved per call rather than at module load
+-   README: `app_origin` was documented as overriding `app.origin`. It is the
+    other way round — `app.origin` wins. The docs now match the code
+-   README: documents that omitting `available_languages` silently disables
+    alternate links
+
+### Removed
+
+-   dead `if (!config)` guard — `getConfig` returns `{}`, so it never fired
+
 ## [2.0.1] - 2025-07-19
 
 ### Added

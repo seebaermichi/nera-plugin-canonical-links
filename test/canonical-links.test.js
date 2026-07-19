@@ -2,8 +2,12 @@ import { describe, it, expect } from 'vitest'
 import path from 'path'
 import pug from 'pug'
 import { load } from 'cheerio'
+import { fileURLToPath } from 'url'
 
-const VIEWS_DIR = path.join(process.cwd(), 'views')
+// Anchored to this file, not to cwd: these views live in the package
+// regardless of where vitest was invoked from.
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const VIEWS_DIR = path.join(__dirname, '../views')
 
 describe('Canonical links view rendering', () => {
     it('renders canonical and alternate link tags correctly', () => {

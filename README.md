@@ -39,17 +39,42 @@ available_languages:
     - fr
 ```
 
--   `app_origin`: The canonical base URL (overrides `app.origin`).
+-   `app_origin`: The canonical base URL. Used as a fallback — if `origin` is
+    set in `config/app.yaml`, **that wins**.
 -   `page_identifier`: Shared key to match localized versions (defaults to `slug`).
--   `available_languages`: List of supported language codes (used to create alternate links).
+-   `available_languages`: List of supported language codes, used to create
+    alternate links. **Omitting it disables alternate links entirely** — you
+    get canonical tags only, with no warning.
+
+If neither `app.origin` nor `app_origin` resolves, the plugin generates no
+canonical links at all and prints a warning. Earlier versions emitted
+`<link rel="canonical" href="undefined/…">` in that case.
+
+## 🛠️ Template Publishing
+
+Copy the plugin's templates into your project:
+
+```bash
+npx nera-canonical-links
+```
+
+This copies `index.pug` and its `partials/` to:
+
+```
+views/vendor/plugin-canonical-links/
+```
+
+Publishing **skips** if that directory already exists, so your edits are never
+overwritten. To pull in updated templates after an upgrade, discarding your
+changes to them, use `npx nera-canonical-links --force`.
 
 ## 📄 Usage in Templates
 
-Include the plugin’s view in your layout head:
+Include the published view in your layout head:
 
 ```pug
 head
-    include /node_modules/@nera-static/plugin-canonical-links/views/index
+    include vendor/plugin-canonical-links/index
 ```
 
 This will generate:
@@ -121,7 +146,7 @@ The plugin provides a view file that includes two partials:
             link(href=alternate.href, hreflang=alternate.hreflang, rel=alternate.rel)
     ```
 
-You can copy or customize these templates for full control.
+Publish them (see above) and customize the copies for full control.
 
 ## 🧪 Development
 
