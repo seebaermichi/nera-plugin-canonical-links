@@ -1,5 +1,8 @@
 # @nera-static/plugin-canonical-links
 
+[![Test](https://github.com/seebaermichi/nera-plugin-canonical-links/actions/workflows/test.yml/badge.svg)](https://github.com/seebaermichi/nera-plugin-canonical-links/actions/workflows/test.yml)
+[![npm version](https://img.shields.io/npm/v/@nera-static/plugin-canonical-links)](https://www.npmjs.com/package/@nera-static/plugin-canonical-links)
+
 A plugin for the [Nera](https://github.com/seebaermichi/nera) static site generator to generate canonical and alternate `<link>` tags for SEO in the document `<head>`. Helps search engines correctly index content across domains and languages.
 
 ## ✨ Features
