@@ -6,7 +6,8 @@
     "scripts": {
         "publish-template": "node ./bin/publish-template.js",
         "lint": "eslint .",
-        "test": "vitest"
+        "test": "vitest",
+        "prepare": "husky"
     },
     "type": "module",
     "exports": {
@@ -43,6 +44,9 @@
         "url": "https://github.com/seebaermichi/nera-plugin-canonical-links/issues"
     },
     "homepage": "https://github.com/seebaermichi/nera-plugin-canonical-links#readme",
+    "publishConfig": {
+        "access": "public"
+    },
     "dependencies": {
         "@nera-static/plugin-utils": "^1.2.0"
     },
