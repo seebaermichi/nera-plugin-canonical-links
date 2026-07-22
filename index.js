@@ -13,20 +13,36 @@ function getHostConfig() {
  * before 2.1.0.
  */
 function getOrigin(data, config) {
-    return data.app?.origin || config.app_origin
+    const origin = data.app?.origin || config.app_origin
+
+    // A trailing slash would produce `https://example.com//page.html`, since
+    // meta.href already starts with one — a duplicate URL handed to search
+    // engines as the authoritative one, which is the thing this plugin exists
+    // to prevent.
+    return typeof origin === 'string' ? origin.replace(/\/+$/, '') : origin
 }
 
 function getAlternates(pageMeta, data, config, origin) {
     const pageIdentifier = config.page_identifier || 'slug'
     const availableLanguages = config.available_languages || []
     const multiLangCanonicals = []
+    const identifier = pageMeta[pageIdentifier]
+
+    // Without an identifier there is nothing to match translations on.
+    // Comparing the raw values would make `undefined === undefined` true, so
+    // every page missing the key was declared a translation of the first
+    // other-language page that was also missing it — including the pages other
+    // plugins generate, which never carry one.
+    if (identifier === undefined || identifier === null) {
+        return multiLangCanonicals
+    }
 
     availableLanguages.forEach((availableLang) => {
         if (pageMeta.lang && availableLang !== pageMeta.lang) {
             const relCanonical = data.pagesData.find(
                 ({ meta }) =>
                     meta.lang === availableLang &&
-                    meta[pageIdentifier] === pageMeta[pageIdentifier]
+                    meta[pageIdentifier] === identifier
             )
 
             if (relCanonical) {

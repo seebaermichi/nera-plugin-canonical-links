@@ -1,6 +1,6 @@
 {
     "name": "@nera-static/plugin-canonical-links",
-    "version": "2.2.0",
+    "version": "2.2.1",
     "description": "A plugin for Nera static site generator to create canonical links in to be used in the head.",
     "main": "index.js",
     "scripts": {

@@ -80,6 +80,29 @@ describe('getMetaData — origin resolution', () => {
         )
     })
 
+    it('strips a trailing slash from the origin', () => {
+        const result = getMetaData({
+            app: { origin: 'https://from-app.test/' },
+            pagesData: pages(),
+        })
+
+        // Not https://from-app.test//index.html — meta.href already leads
+        // with a slash.
+        expect(result[0].meta.canonicalLink.href).toBe(
+            'https://from-app.test/index.html'
+        )
+    })
+
+    it('strips a trailing slash from config.app_origin too', () => {
+        writeConfig('app_origin: https://from-config.test///\n')
+
+        const result = getMetaData({ app: {}, pagesData: pages() })
+
+        expect(result[0].meta.canonicalLink.href).toBe(
+            'https://from-config.test/index.html'
+        )
+    })
+
     it('prefers app.origin over config.app_origin when both are set', () => {
         writeConfig('app_origin: https://from-config.test\n')
 
@@ -150,6 +173,51 @@ available_languages:
 
         expect(result[0].meta.alternateLinks).toHaveLength(1)
         expect(result[0].meta.alternateLinks[0].hreflang).toBe('de')
+    })
+
+    it('does not treat two pages that both lack the identifier as translations', () => {
+        writeConfig(`
+app_origin: https://example.test
+available_languages:
+  - en
+  - es
+`)
+
+        // Neither page has a slug. Before 2.2.1 the find() compared
+        // `undefined === undefined`, so these unrelated pages were cross-linked
+        // with hreflang — the live symptom was every generated tag-overview
+        // page pointing at the same unrelated page in each other language.
+        const pagesData = [
+            { content: '', meta: { href: '/about.html', lang: 'en' } },
+            { content: '', meta: { href: '/es/contacto.html', lang: 'es' } },
+        ]
+
+        const result = getMetaData({ app: {}, pagesData })
+
+        expect(result[0].meta.alternateLinks).toEqual([])
+        expect(result[1].meta.alternateLinks).toEqual([])
+        // The canonical link itself is unaffected — it needs no identifier.
+        expect(result[0].meta.canonicalLink.href).toBe(
+            'https://example.test/about.html'
+        )
+    })
+
+    it('ignores candidate pages that lack the identifier', () => {
+        writeConfig(`
+app_origin: https://example.test
+available_languages:
+  - en
+  - es
+`)
+
+        const pagesData = [
+            { content: '', meta: { href: '/a.html', lang: 'en', slug: 'a' } },
+            { content: '', meta: { href: '/es/noslug.html', lang: 'es' } },
+        ]
+
+        const result = getMetaData({ app: {}, pagesData })
+
+        expect(result[0].meta.alternateLinks).toEqual([])
     })
 
     it('emits no alternates for a page with no lang', () => {
