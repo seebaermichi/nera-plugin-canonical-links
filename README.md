@@ -5,6 +5,8 @@
 
 A plugin for the [Nera](https://github.com/seebaermichi/nera) static site generator to generate canonical and alternate `<link>` tags for SEO in the document `<head>`. Helps search engines correctly index content across domains and languages.
 
+📖 **Documentation:** [nera.js.org](https://nera.js.org)
+
 ## ✨ Features
 
 - Adds `<link rel="canonical">` for SEO
@@ -262,6 +264,7 @@ Michael Becker
 
 - [Plugin Repository](https://github.com/seebaermichi/nera-plugin-canonical-links)
 - [NPM Package](https://www.npmjs.com/package/@nera-static/plugin-canonical-links)
+- [Nera Website](https://nera.js.org)
 - [Nera Static Site Generator](https://github.com/seebaermichi/nera)
 
 ## 🧩 Compatibility
