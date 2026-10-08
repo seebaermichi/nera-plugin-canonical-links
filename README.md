@@ -64,11 +64,13 @@ head
     include /vendor/plugin-canonical-links/index
 ```
 
-The leading slash makes this **root-absolute**: it resolves against your
-`views/` directory regardless of where the including file sits. It requires
-Nera **v4.3.0+**. On v4.1.x–v4.2.x, use the relative form instead — the path is
-then relative to the **including file**, so this assumes a layout in
-`views/layouts/`:
+The leading slash makes this **root-absolute**: it resolves against your views
+folder — `theme/views/` on a site scaffolded with `nera new` — regardless of
+where the including file sits (there is no `theme/` or `views/` segment in the
+path). It requires Nera **v4.3.0+**. On v4.1.x–v4.2.x, use the relative form
+instead — the path is then relative to the **including file**, so this assumes
+a layout in `theme/views/layouts/` (such as the `layout.pug` that `nera new`
+scaffolds):
 
 ```pug
 head
@@ -76,8 +78,11 @@ head
 ```
 
 A bare `include vendor/plugin-canonical-links/index` (no leading slash) is
-**not** equivalent: from `views/layouts/` it resolves to
-`views/layouts/vendor/…` and fails the build.
+**not** equivalent: from `theme/views/layouts/` it resolves to
+`theme/views/layouts/vendor/…` and fails the build.
+
+On an older site that renders from a root `views/` folder (no `theme/`), drop
+the `theme/` prefix from the paths in this README.
 
 ## 🛠️ Template Publishing
 
@@ -90,8 +95,11 @@ npx nera-canonical-links
 This copies `index.pug` and its `partials/` to:
 
 ```
-views/vendor/plugin-canonical-links/
+theme/views/vendor/plugin-canonical-links/
 ```
+
+The destination is theme-aware: on an older site without a `theme/` folder the
+templates go to root `views/vendor/plugin-canonical-links/` instead.
 
 Publishing **skips** if that directory already exists, so your edits are never
 overwritten. To pull in updated templates after an upgrade, discarding your
@@ -203,7 +211,8 @@ so they get a canonical link and no alternates.
 
 ## 🧩 Rendering Details
 
-The plugin provides a view file that includes two partials:
+The plugin package ships a view file (in its own `views/` folder) that includes
+two partials:
 
 - `views/index.pug`
 
@@ -251,7 +260,7 @@ For this repo specifically:
 - `npx vitest run` and `npm run lint` must pass (`npm test` is watch mode).
 - Bump the version and update `CHANGELOG.md` **in the same commit** as the change.
 - The template markup is a **public contract** — users publish copies into
-  `views/vendor/plugin-canonical-links/` and include them from their own
+  `theme/views/vendor/plugin-canonical-links/` and include them from their own
   layouts, so changing what the templates emit is a **major** bump.
 - Releases publish from CI on a pushed `v*` tag. Never run `npm publish`.
 
@@ -272,11 +281,15 @@ Michael Becker
 - **Nera**: v4.3.0+ for the root-absolute `include /vendor/…` shown in Usage,
   which needs the Pug `basedir` the generator began setting in 4.3.0. The
   plugin itself needs nothing above the 4.x baseline — on v4.1.x–v4.2.x use the
-  relative include. The `config/plugin-order.yaml` advice above needs v4.2.0+.
+  relative include. The `config/plugin-order.yaml` advice above needs v4.2.0+,
+  and the `theme/` folder layout used in the examples — what `nera new`
+  scaffolds — needs v4.6.0+.
 - **Node.js**: >= 20.0.0
 - **Plugin Utils**: `^1.2.0` — `npx nera-canonical-links` calls
   `publishAllTemplates`, added in 1.2.0, which is what copies `partials/`
-  alongside `index.pug`.
+  alongside `index.pug`. Publishing into `theme/views/` (rather than root
+  `views/`) needs plugin-utils 1.5.0+, which the caret range resolves to on a
+  fresh install.
 - **Plugin API**: exports `getMetaData()`, which writes per-page data.
 
 ## 📦 License
