@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.3] - 2026-10-11
+
+### Fixed
+
+-   canonical and alternate URLs now include the site's `base_path`. They were
+    built as `origin + meta.href`, so a site served from a subdirectory
+    (`base_path: /docs/`) declared `https://example.com/page.html` canonical
+    instead of the deployed `https://example.com/docs/page.html` — a URL that
+    does not exist — and disagreed with `@nera-static/plugin-sitemap`. The
+    href is now `origin + app.basePath + meta.href`. This changes the
+    canonical URL on `base_path` sites only, to the one they are actually
+    served under, so it is a bugfix; a site without `base_path` gets
+    byte-identical output.
+
 ## [2.2.2] - 2026-10-08
 
 ### Fixed

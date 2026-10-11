@@ -236,3 +236,52 @@ available_languages:
         expect(result[0].meta.alternateLinks).toEqual([])
     })
 })
+
+describe('getMetaData — base_path', () => {
+    const config = `
+app_origin: https://example.test/
+available_languages:
+  - en
+  - es
+`
+
+    it('puts app.basePath between the origin and meta.href', () => {
+        writeConfig(config)
+
+        const result = getMetaData({ app: { basePath: '/docs' }, pagesData: pages() })
+
+        expect(result[0].meta.canonicalLink.href).toBe('https://example.test/docs/index.html')
+        expect(result[0].meta.alternateLinks).toEqual([
+            { href: 'https://example.test/docs/es/index.html', hreflang: 'es', rel: 'alternate' },
+        ])
+        expect(result[1].meta.canonicalLink.href).toBe('https://example.test/docs/es/index.html')
+        expect(result[1].meta.alternateLinks[0].href).toBe('https://example.test/docs/index.html')
+    })
+
+    it('trims a trailing slash on basePath', () => {
+        writeConfig(config)
+
+        const result = getMetaData({ app: { basePath: '/docs/' }, pagesData: pages() })
+
+        expect(result[0].meta.canonicalLink.href).toBe('https://example.test/docs/index.html')
+    })
+
+    // A root-served site (core's basePath '') and an app without the key
+    // (an older core) must produce exactly what 2.2.2 did.
+    it.each([[{ basePath: '' }], [{}]])('leaves the URLs unchanged for app %j', (app) => {
+        writeConfig(config)
+
+        const result = getMetaData({ app, pagesData: pages() })
+
+        expect(result.map(({ meta }) => [meta.canonicalLink, meta.alternateLinks])).toEqual([
+            [
+                { href: 'https://example.test/index.html', rel: 'canonical' },
+                [{ href: 'https://example.test/es/index.html', hreflang: 'es', rel: 'alternate' }],
+            ],
+            [
+                { href: 'https://example.test/es/index.html', rel: 'canonical' },
+                [{ href: 'https://example.test/index.html', hreflang: 'en', rel: 'alternate' }],
+            ],
+        ])
+    })
+})

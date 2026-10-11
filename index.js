@@ -22,7 +22,21 @@ function getOrigin(data, config) {
     return typeof origin === 'string' ? origin.replace(/\/+$/, '') : origin
 }
 
-function getAlternates(pageMeta, data, config, origin) {
+/**
+ * The origin plus core's normalized `app.basePath` ('' or '/sub'), so a
+ * site served from a subdirectory gets the URLs it is actually deployed
+ * under. Core only prefixes root-relative URLs, never an absolute one, so
+ * the prefix has to be part of the base here. Without `base_path` this is
+ * the origin unchanged.
+ */
+function getBaseUrl(data, origin) {
+    const basePath = data.app?.basePath
+    return typeof basePath === 'string'
+        ? `${origin}${basePath.replace(/\/+$/, '')}`
+        : origin
+}
+
+function getAlternates(pageMeta, data, config, baseUrl) {
     const pageIdentifier = config.page_identifier || 'slug'
     const availableLanguages = config.available_languages || []
     const multiLangCanonicals = []
@@ -47,7 +61,7 @@ function getAlternates(pageMeta, data, config, origin) {
 
             if (relCanonical) {
                 multiLangCanonicals.push({
-                    href: `${origin}${relCanonical.meta.href}`,
+                    href: `${baseUrl}${relCanonical.meta.href}`,
                     hreflang: availableLang,
                     rel: 'alternate',
                 })
@@ -58,9 +72,9 @@ function getAlternates(pageMeta, data, config, origin) {
     return multiLangCanonicals
 }
 
-function getCanonical(meta, origin) {
+function getCanonical(meta, baseUrl) {
     return {
-        href: `${origin}${meta.href}`,
+        href: `${baseUrl}${meta.href}`,
         rel: 'canonical',
     }
 }
@@ -81,12 +95,14 @@ export function getMetaData(data) {
         return data.pagesData
     }
 
+    const baseUrl = getBaseUrl(data, origin)
+
     return data.pagesData.map(({ content, meta }) => {
         return {
             content,
             meta: Object.assign({}, meta, {
-                canonicalLink: getCanonical(meta, origin),
-                alternateLinks: getAlternates(meta, data, config, origin),
+                canonicalLink: getCanonical(meta, baseUrl),
+                alternateLinks: getAlternates(meta, data, config, baseUrl),
             }),
         }
     })

@@ -120,6 +120,11 @@ For an English page with Spanish and French translations:
 <link href="https://example.com/fr/index.html" hreflang="fr" rel="alternate" />
 ```
 
+On a site served from a subdirectory (`base_path: /docs/` in
+`config/app.yaml`) the path sits between the origin and the page, e.g.
+`https://example.com/docs/index.html` — the URL the page is deployed under.
+Before 2.2.3 it was left out.
+
 The templates emit `link` elements only, with no `class` attributes — there is
 nothing to style, and nothing here is a CSS contract.
 
