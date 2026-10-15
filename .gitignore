@@ -30,3 +30,4 @@ build/
 
 # npm auth — never commit credentials
 .npmrc
+plans/
