@@ -1,6 +1,15 @@
-app_origin: https://example.com
+# Active keys are the built-in defaults; commented keys are examples to adapt.
+# The plugin reads config/canonical-links.yaml from YOUR site, never this copy.
+
+# The meta key that matches a page to its translations (default: slug).
 page_identifier: slug
-available_languages:
-  - en
-  - es
-  - fr
+
+# Fallback origin for canonical URLs, used only when `origin` in
+# config/app.yaml is not set. Without either, no links are generated.
+# app_origin: https://your-domain.com
+
+# Languages to emit `<link rel="alternate" hreflang>` for (default: none).
+# available_languages:
+#   - en
+#   - es
+#   - fr

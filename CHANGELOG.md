@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.4] - 2026-11-19
+
+### Fixed
+
+-   The shipped `config/canonical-links.yaml` no longer sets a sample `app_origin: https://example.com` or `available_languages: [en, es, fr]`. `nera add canonical-links` copies that file into a site that has none, so every canonical link pointed at example.com and every page got hreflang alternates for languages the site may not have. Both are now commented-out examples; the active key (`page_identifier: slug`) is the default. A site that got the file that way should delete those two keys, or set them to its own values.
+
 ## [2.2.3] - 2026-10-11
 
 ### Fixed
